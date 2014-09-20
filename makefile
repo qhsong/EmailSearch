@@ -12,5 +12,3 @@ main.o: main.c bloom.h
 hash.o: hash.c hash.h
 	cc -o hash.o -Wall -pedantic -ansi -c hash.c
 
-trie.o: trie.c trie.h
-    cc -o trie.o -Wall -pedantic -ansi -c trie.c
