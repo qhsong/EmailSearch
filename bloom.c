@@ -41,6 +41,10 @@ BF* bloom_create()
 
 int bloom_destroy(BF **bfArray)
 {
+	BF *p = *bfArray;
+	free(p->filter);
+	free(p);
+	p = NULL;
 	return 0;
 }
 
@@ -75,10 +79,10 @@ int bloom_check(BF **bfArray,char *str)
 void bloom(FILE *pool,FILE *check,FILE *result) {
 	BF *b=bloom_create();
 	char line[BUFFERSIZE];
-	int pos = 0;
+	/* int pos = 0; */
 	while(fgets(line,BUFFERSIZE,pool)) {
 		bloom_add(&b,line);
-		printf("%d -> %s",pos++,line);
+	/*	printf("%d -> %s",pos++,line); */
 	}
 	while(fgets(line,BUFFERSIZE,check)) {
 		if(bloom_check(&b,line)){
