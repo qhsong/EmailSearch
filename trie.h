@@ -5,6 +5,7 @@
 #include<stdlib.h>
 
 typedef struct {
+	bool isEmail;
 	TRIE *next[40];
 }TRIE;
 

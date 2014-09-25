@@ -6,14 +6,26 @@
 
 int getpos(char a) {
 	if(a>='a' && a<='z') {
-		return a-96;
+		return a-97;
+	}else if(a>='A' && a<='Z'){
+		return a-65;
 	}else if(a>='-' && a<='.') {
-		return a-'-'+27;
+		return a-'-'+26;
+	}else if(a>='0' && a<='9') {
+		return a-'0'+28;
+	}else if(a=='_') {
+		return 39;
 	}
 }
 
 TRIE* trie_create(){
-	return (TRIE *)malloc(sizeof(TRIE));
+	int i;
+	TRIE *p = (TRIE *)malloc(sizeof(TRIE));
+	p->isEmail = false;
+	for(i=0;i<40;i++) {
+		p->next[i] = NULL;
+	}
+	return p;
 }
 
 int trie_detroy(BF **head) {
@@ -21,10 +33,23 @@ int trie_detroy(BF **head) {
 }
 
 int trie_add(TRIE **head,char *str) {
+	TRIE *t = *head;
+	int pos;
+	while(str){
+		pos = getpos(*str)
+		if(t->next[pos]){
+			t->next[pos] = (TRIE *)malloc(sizeof(TRIE));
+		}
+		t = t->next[pos];
+		str++;
+	}
+	t->isEmail = true;
 	return 0;
 }
 
 int trie_check(TRIE **head,char *str) {
+	TRIE *t = *head;
+	while(
 	return 0;
 }
 
