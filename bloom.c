@@ -53,6 +53,11 @@ int bloom_add(BF **bfArray,char *str)
 	BF *p = *bfArray;
 	int len = strlen(str);
 	int i;
+	for(i = 0 ;i<len ; i++) {
+		if(str[i]>='A' && str[i]<='Z') {
+			str[i] -= 32;	
+		}
+	}
 	for(i = 0 ; i<FUNCNUM ; i++ ) {
 		unsigned int temp = func[i](str,len);
 		temp %= BITSIZE;
@@ -66,6 +71,11 @@ int bloom_check(BF **bfArray,char *str)
 	BF *p = *bfArray;
 	int len = strlen(str);
 	int i;
+	for(i = 0 ;i<len ; i++) {
+		if(str[i]>='A' && str[i]<='Z') {
+			str[i] -= 32;	
+		}
+	}
 	for(i= 0 ;i <FUNCNUM ;i++) {
 		unsigned int temp = func[i](str,len);
 		unsigned int result;
