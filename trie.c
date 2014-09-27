@@ -14,7 +14,12 @@ int getpos(char a) {
 	}else if(a>='0' && a<='9') {
 		return a-'0'+28;
 	}else if(a=='_') {
+		return 38;
+	}else if(a=='@') {
 		return 39;
+	}else{
+		printf("unknown character:%c",a);
+		exit(1);
 	}
 }
 
@@ -28,21 +33,20 @@ TRIE* trie_create(){
 	return p;
 }
 
-void trie_detroy(BF **head) {
+void trie_destroy(TRIE **head) {
 	int i;
-
 	for(i=0;i<40;i++) {
-		trie_detory(head->next[i]);
+		trie_destroy(&((*head)->next[i]));
 	}
-	free(**head)
+	free(*head);
 }
 
 int trie_add(TRIE **head,char *str) {
 	TRIE *t = *head;
 	int pos;
-	while(str){
-		pos = getpos(*str)
-		if(t->next[pos]){
+	while(str && *str != '\r' && *str !='\n'){
+		pos = getpos(*str);
+		if(!t->next[pos]){
 			t->next[pos] = (TRIE *)malloc(sizeof(TRIE));
 		}
 		t = t->next[pos];
@@ -55,7 +59,7 @@ int trie_add(TRIE **head,char *str) {
 int trie_check(TRIE **head,char *str) {
 	TRIE *t = *head;
 	int pos;
-	while(t!=NULL && !t->isEmail) {
+	while(t!=NULL && !t->isEmail && *str!='\r') {
 		pos = getpos(*str);
 		t = t->next[pos];
 	}
@@ -71,8 +75,10 @@ int trie_check(TRIE **head,char *str) {
 void trie(FILE *pool,FILE *check,FILE *result) {
 	TRIE *head = trie_create();
 	char line[BUFFERSIZE];
+	int count=0;
 	while(fgets(line,BUFFERSIZE,pool)) {
 		trie_add(&head,line);
+		printf("%d\n",++count);
 	}
 	while(fgets(line,BUFFERSIZE,check)) {
 		if(trie_check(&head,line)) {
@@ -81,5 +87,5 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 			fprintf(result,"no\n");
 		}
 	}
-	trie_destory(&head);
+	trie_destroy(&head);
 }

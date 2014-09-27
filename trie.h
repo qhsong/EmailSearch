@@ -4,13 +4,18 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-typedef struct {
-	bool isEmail;
-	TRIE *next[40];
-}TRIE;
+#define true 1
+#define false 0
+
+struct trieTree{
+	int isEmail;
+	struct trieTree *next[40];
+};
+
+typedef struct trieTree TRIE;
 
 TRIE* trie_create();
-int trie_detroy(BF **head);
+void trie_destroy(TRIE **head);
 int trie_add(TRIE **head,char *str);
 int trie_check(TRIE **head,char *str);
 void trie(FILE *pool,FILE *check,FILE *result);
