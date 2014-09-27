@@ -38,19 +38,27 @@ int getpos(char a) {
 }
 
 int main() {
+	int flag[512];
 	FILE *in = fopen("strpool.dat","r");
-	int count = 0;
+	long count = 0;
+	int linecount = 0;
 	char line[1024];
 	int len,i;
+	for(i=0 ;i<512;i++) flag[i] = 0;
 	while(fgets(line,1024,in)) {
-		count++;
+		linecount++;
 		len = strlen(line);
 		for(i = 0; i< len - 2 ;i++){
-			if(getpos(line[i])==41){
-				printf("%d\n",count);
+		/*	if(getpos(line[i])==41){
+				flag[line[i]] = 1;
 				break;
 			}
+		*/
+		
 		}
+	}
+	for(i=0;i<512;i++) {
+		if(flag[i]) printf("%c %d\n",i,i);
 	}
 	return 0;
 }

@@ -9,7 +9,7 @@
 
 struct trieTree{
 	int isEmail;
-	struct trieTree *next[40];
+	struct trieTree *next[63];
 };
 
 typedef struct trieTree TRIE;

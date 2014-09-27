@@ -4,7 +4,7 @@
 
 #define BUFFERSIZE 1024
 
-int getpos(char a) {
+/*int getpos(char a) {
 	if(a>='a' && a<='z') {
 		return a-97;
 	}else if(a>='A' && a<='Z'){
@@ -19,6 +19,22 @@ int getpos(char a) {
 		return 39;
 	}else{
 		printf("unknown character:%c",a);
+		exit(1);
+	}
+}
+*/
+
+int getpos(char a) {
+	if(a>=' ' && a<='Z') {
+		return a-32;
+	}else if(a>='a' && a<='z') {
+		return a-'a'+33;
+	}else if(a>='[' && a<='_') {
+		return a-'['+59;
+	}else if(a == '{') {
+		return 62;
+	}else {
+		printf("Unknown character:%c\n",a);
 		exit(1);
 	}
 }
@@ -59,15 +75,16 @@ int trie_add(TRIE **head,char *str) {
 int trie_check(TRIE **head,char *str) {
 	TRIE *t = *head;
 	int pos;
-	while(t!=NULL && !t->isEmail && *str!='\r') {
+	while(t!=NULL && !t->isEmail && *str!='\r' && *str) {
 		pos = getpos(*str);
 		t = t->next[pos];
+		str++;
 	}
 
 	if(t==NULL) {
 		return 0;
-	}else{
-		return 1;
+	}else {
+		return t->isEmail;
 	} 
 
 }
@@ -79,6 +96,7 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 	while(fgets(line,BUFFERSIZE,pool)) {
 		trie_add(&head,line);
 		printf("%d\n",++count);
+/*		printf("%s",trie_check(&head,line)?"Yes":"No") ;*/
 	}
 	while(fgets(line,BUFFERSIZE,check)) {
 		if(trie_check(&head,line)) {
