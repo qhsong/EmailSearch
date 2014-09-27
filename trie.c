@@ -28,8 +28,13 @@ TRIE* trie_create(){
 	return p;
 }
 
-int trie_detroy(BF **head) {
-	return 0;
+void trie_detroy(BF **head) {
+	int i;
+
+	for(i=0;i<40;i++) {
+		trie_detory(head->next[i]);
+	}
+	free(**head)
 }
 
 int trie_add(TRIE **head,char *str) {
@@ -49,8 +54,18 @@ int trie_add(TRIE **head,char *str) {
 
 int trie_check(TRIE **head,char *str) {
 	TRIE *t = *head;
-	while(
-	return 0;
+	int pos;
+	while(t!=NULL && !t->isEmail) {
+		pos = getpos(*str);
+		t = t->next[pos];
+	}
+
+	if(t==NULL) {
+		return 0;
+	}else{
+		return 1;
+	} 
+
 }
 
 void trie(FILE *pool,FILE *check,FILE *result) {
@@ -66,4 +81,5 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 			fprintf(result,"no\n");
 		}
 	}
+	trie_destory(&head);
 }
