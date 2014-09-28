@@ -20,7 +20,7 @@ int getpos(char a) {
 }
 
 NODELIST* node_find(NODELIST *l,char c) {
-	while(l != null ){
+	while(l != NULL ){
 		if( l->c == c) break;
 		l = l->next;
 	}
@@ -28,7 +28,6 @@ NODELIST* node_find(NODELIST *l,char c) {
 }
 
 TRIE* trie_create(){
-	int i;
 	TRIE *p = (TRIE *)malloc(sizeof(TRIE));
 	p->isEmail = false;
 	p->list = NULL;
@@ -36,7 +35,14 @@ TRIE* trie_create(){
 }
 
 void trie_destroy(TRIE **head) {
-	int i;
+	NODELIST *p,*q;
+	p = (*head)->list;
+	while(p){
+		trie_destroy(&(p->tnext));
+		q = p;
+		p = p->next;
+		free(q);
+	}
 	free(*head);
 }
 
@@ -44,8 +50,8 @@ void trie_destroy(TRIE **head) {
 int trie_add(TRIE **head,char *str) {
 	TRIE *t = *head;
 	while(str && *str != '\r' && *str !='\n'){
-		NODELIST *l = node_find(l->list,*str);
-		if(q){
+		NODELIST *l = node_find(t->list,*str);
+		if(l){
 			t = l->tnext;
 		}else{
 			NODELIST *p = t->list;
@@ -70,10 +76,11 @@ int trie_add(TRIE **head,char *str) {
 
 int trie_check(TRIE **head,char *str) {
 	TRIE *t = *head;
-	int pos;
 	while(t!=NULL && !t->isEmail && *str!='\r' && *str) {
-		pos = getpos(*str);
-		t = t->next[pos];
+		NODELIST *l = t->list;
+		l = node_find(l,*str);
+		if(!l)  t = NULL;
+		t = l->tnext;
 		str++;
 	}
 

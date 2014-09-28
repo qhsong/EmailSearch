@@ -48,18 +48,23 @@ int main() {
 	while(fgets(line,1024,in)) {
 		linecount++;
 		len = strlen(line);
+		count +=len;
+		/*
 		for(i = 0; i< len - 2 ;i++){
-		/*	if(getpos(line[i])==41){
+			if(getpos(line[i])==41){
 				flag[line[i]] = 1;
 				break;
 			}
-		*/
-		
 		}
+		*/
+
 	}
+	/*
 	for(i=0;i<512;i++) {
 		if(flag[i]) printf("%c %d\n",i,i);
 	}
+	*/
+	printf("count is:%ld.Line count is:%d %f",count,linecount,(double)count/(double)linecount);
 	return 0;
 }
 

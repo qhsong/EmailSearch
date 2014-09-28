@@ -20,7 +20,7 @@ struct sNodeList {
 
 struct trieTree{
 	int isEmail;
-	struct NODELIST *list;
+	struct sNodeList *list;
 };
 
 
