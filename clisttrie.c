@@ -1,5 +1,6 @@
 #include<limits.h>
-
+#include<string.h>
+	
 #include "clisttrie.h"
 
 #define BUFFERSIZE 1024
@@ -7,14 +8,14 @@
 /*This function used to find the longest common header between s1 and s2.Return the max common character index,if not, return -1; */
 
 int find_common_head(char *s1,char *s2) {
-	int index = -1;
+	int index = 0;
 	while(*s1++==*s2++) index++;
 	return index;
 }
 
 NODELIST* node_find(NODELIST *l,char *str,int *count) {
 	while(l){
-		if((*count = find_common_head(l->cNode,str))==-1){
+		if(*count = find_common_head(l->cNode,str)){
 			l = l->next;	
 		}else{
 			return l;
@@ -37,30 +38,87 @@ void trie_destroy(TRIE **head) {
 int trie_add(TRIE **head,char *str) {
 	TRIE *t = *head;
 	int index=0,len1,len2;
-	char *temp;
-	len2 = strlen(str);
+	char *pstr;
 	while(*str){
 		NODELIST *l =node_find(t->list,str,&index);
 		if(l){	//exist the same header string.OK divided it.
 			len1 = strlen(l->cNode);
-			if(index==len1 && index==len2){
-
-			}else if(index == len2){
-				if(!l->tnext){
-					l->tnext = (TRIE *)malloc(sizeof(TRIE));
-					l->tnext->list = NULL;
-					l->tnext->isEmail = false;
-				}
-				t = l->tnext;
-				str += index;
-			}else if(index == len1) {
-				temp = l->cNode;
-
-			}else {
+			len2 = strlen(str);
+			if(!l->tnext){
+				l->tnext = (TRIE *)malloc(sizeof(TRIE));
+				l->tnext->isEmail = false;
+				l->tnext->list = NULL;
+			}
+			if(index == len2 && index !=len1){	//str is short
 			
+				//find the end of list
+				TRIE *tp = l->tnext;
+				NODELIST *p = tp->list,*q;
+				q = p;
+				while(p){
+					q = p;
+					p=p->next;
+				}
+				
+				//new a sub node
+				q->next = (NODELIST *)malloc(sizeof(NODELIST));
+				q = q->next;
+				pstr = l->cNode;
+				pstr += index;
+				strcpy(q->cNode,pstr);
+				q->next = NULL;
+				
+				//change l->cNode
+				l->cNode[index] = '\0';
+
+				//if it is a word,then new a node
+				if(tp->isEmail){
+					q->tnext = (TRIE *)malloc(sizeof(TRIE));
+					q->tnext->isEmail = true;
+					q->tnext->list = NULL;
+				}else{
+					q->tnext = NULL;
+				}
+				
+				//reset t
+				t = tp;
+			}else if((index == len1 && index !=len2) ||(index ==len1 && index==len2)) {  //l->cNode
+				t = l->tnext;
+			}else{	//both has common part
+				TRIE *tpnode = l->tnext;
+				NODELIST *p = tpnode->list,*q;
+				q = p;
+				while(p){
+					q = p;
+					p = p->next;
+				}
+
+				q->next = (NODELIST *)malloc(sizeof(NODELIST));
+				q = q->next;
+				pstr = l->cNode;
+				pstr += index;
+				strcpy(q->cNode,pstr);
+				pstr = l->cNode;
+				pstr[index] = '\0';
+				if(tpnode->isEmail){
+					q->tnext = (TRIE *)malloc(sizeof(TRIE));
+					q->tnext->isEmail = true;
+					q->tnext->list = NULL;
+				}else{
+					q->tnext = NULL;
+				}
+				
+
+				q->next = (NODELIST *)malloc(sizeof(NODELIST));
+				q = q->next;
+				pstr = str;
+				pstr += index;
+				q->tnext = NULL;
+				strcpy(q->cNode,pstr);
+				q->next = NULL;
 			}
 		}else{	//new
-			
+			//TODO:add to basic	
 		}
 	}
 }
