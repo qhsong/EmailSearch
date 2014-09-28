@@ -19,12 +19,12 @@ int main(int argc, char **argv)
 	
 	FILE *fpStrpool = fopen("strpool.dat","r");
 	FILE *fpCheckedstr = fopen("checkedemail.dat","r");
-	FILE *fpResult2 = fopen("result_trie.dat","w");
+	FILE *fpResult2 = fopen("result_bloom.dat","w");
 	if(fpStrpool == NULL || fpCheckedstr == NULL){
 		printf("Input file not found!\n");
 		return 0;
 	}
-	/*bloom(fpStrpool,fpCheckedstr,fpResult);*/
-	trie(fpStrpool,fpCheckedstr,fpResult2);
+	bloom(fpStrpool,fpCheckedstr,fpResult2);
+	/*trie(fpStrpool,fpCheckedstr,fpResult2);*/
 	return 0;
 }
