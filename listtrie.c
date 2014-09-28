@@ -44,26 +44,23 @@ void trie_destroy(TRIE **head) {
 int trie_add(TRIE **head,char *str) {
 	TRIE *t = *head;
 	while(str && *str != '\r' && *str !='\n'){
-		if(t->list == NULL) {	//list is empty
-			NODELIST *p = (NODELIST *)malloc(sizeof(NODELIST));
-			p->c = *str;
-			p->next = NULL;
-			p->tnext = NULL;
-			t->list = p;
-		}else{	//not empty
-			NODELIST *q = node_find(l->list,*str);
-			if(q){
-				t = q->tnext;
-			}else{	//not exist
-				NODELIST *q = t->list;
-				while(q->next != NULL) {
-					q = q->next;
-				}
-				q->next = (NODELIST *)malloc(sizeof(NODELIST));
-				q = q->next;
-				q->c = *str;
-				q->next = NULL;
+		NODELIST *l = node_find(l->list,*str);
+		if(q){
+			t = l->tnext;
+		}else{
+			NODELIST *p = t->list;
+			NODELIST *q = p;
+			while( p!= NULL) {
+				q = p;
+				p = p->next;
 			}
+			q->next = (NODELIST *)malloc(sizeof(NODELIST));
+			q = q->next;
+			q->c = *str;
+			q->next = NULL;
+			q->tnext = (TRIE *)malloc(sizeof(TRIE));
+			t = q->tnext;
+			t->list = NULL;
 		}
 		str++;
 	}
