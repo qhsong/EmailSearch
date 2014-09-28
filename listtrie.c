@@ -4,20 +4,6 @@
 
 #define BUFFERSIZE 1024
 
-int getpos(char a) {
-	if(a>=' ' && a<='Z') {
-		return a-32;
-	}else if(a>='a' && a<='z') {
-		return a-'a'+33;
-	}else if(a>='[' && a<='_') {
-		return a-'['+59;
-	}else if(a == '{') {
-		return 62;
-	}else {
-		printf("Unknown character:%c\n",a);
-		exit(1);
-	}
-}
 
 NODELIST* node_find(NODELIST *l,char c) {
 	while(l != NULL ){
@@ -60,8 +46,13 @@ int trie_add(TRIE **head,char *str) {
 				q = p;
 				p = p->next;
 			}
-			q->next = (NODELIST *)malloc(sizeof(NODELIST));
-			q = q->next;
+			if(q){
+				q->next = (NODELIST *)malloc(sizeof(NODELIST));
+				q = q->next;
+			}else{
+				q = (NODELIST *)malloc(sizeof(NODELIST));
+				t->list = q;
+			}
 			q->c = *str;
 			q->next = NULL;
 			q->tnext = (TRIE *)malloc(sizeof(TRIE));
@@ -79,7 +70,10 @@ int trie_check(TRIE **head,char *str) {
 	while(t!=NULL && !t->isEmail && *str!='\r' && *str) {
 		NODELIST *l = t->list;
 		l = node_find(l,*str);
-		if(!l)  t = NULL;
+		if(!l){
+			t = NULL;
+			break;
+		}
 		t = l->tnext;
 		str++;
 	}
@@ -98,7 +92,7 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 	int count=0;
 	while(fgets(line,BUFFERSIZE,pool)) {
 		trie_add(&head,line);
-		printf("%d\n",++count);
+		if(!(++count%100000))	printf("%d\n",count);
 /*		printf("%s",trie_check(&head,line)?"Yes":"No") ;*/
 	}
 	while(fgets(line,BUFFERSIZE,check)) {
