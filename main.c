@@ -29,5 +29,8 @@ int main(int argc, char **argv)
 	rewind(fpStrpool);
 	rewind(fpCheckedstr);
 	trie(fpStrpool,fpCheckedstr,fpResult2);
+	fclose(fpStrpool);
+	fclose(fpCheckedstr);
+	fclose(fpResult);
 	return 0;
 }
