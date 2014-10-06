@@ -80,42 +80,12 @@ int trie_add(TRIE **head,char *str) {
 					q->tnext = NULL;
 				}
 				
-				//reset t
+				//move t
 				t = tp;
 			}else if((index == len1 && index !=len2) ||(index ==len1 && index==len2)) {  //l->cNode
 				t = l->tnext;
 			}else{	//both has common part
-				TRIE *tpnode = l->tnext;
-				NODELIST *p = tpnode->list,*q;
-				q = p;
-				while(p){
-					q = p;
-					p = p->next;
-				}
-
-				q->next = (NODELIST *)malloc(sizeof(NODELIST));
-				q = q->next;
-				pstr = l->cNode;
-				pstr += index;
-				strcpy(q->cNode,pstr);
-				pstr = l->cNode;
-				pstr[index] = '\0';
-				if(tpnode->isEmail){
-					q->tnext = (TRIE *)malloc(sizeof(TRIE));
-					q->tnext->isEmail = true;
-					q->tnext->list = NULL;
-				}else{
-					q->tnext = NULL;
-				}
 				
-
-				q->next = (NODELIST *)malloc(sizeof(NODELIST));
-				q = q->next;
-				pstr = str;
-				pstr += index;
-				q->tnext = NULL;
-				strcpy(q->cNode,pstr);
-				q->next = NULL;
 			}
 			str += index;
 		}else{	//new
