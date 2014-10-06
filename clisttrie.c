@@ -84,8 +84,21 @@ int trie_add(TRIE **head,char *str) {
 				t = tp;
 			}else if((index == len1 && index !=len2) ||(index ==len1 && index==len2)) {  //l->cNode
 				t = l->tnext;
-			}else{	//both has common part
-				
+			}else{	//both has common parti,devided the nodelist
+				NODELIST *p = l,*q;
+				char *ps = str;
+				q = p;
+				while(p){
+					q = p;
+					p = p->next;
+				}
+				q->next = (NODELIST *)malloc(sizeof(TRIE));
+				q = q->next;
+				ps += index;
+				strcpy(q->cNode,ps);
+				q->tnext = l->tnext;
+				l->cNode[index] = '\0';
+
 			}
 			str += index;
 		}else{	//new
