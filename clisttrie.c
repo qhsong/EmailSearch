@@ -117,8 +117,19 @@ int trie_add(TRIE **head,char *str) {
 				strcpy(q->cNode,pstr);
 				q->next = NULL;
 			}
+			str += index;
 		}else{	//new
-			//TODO:add to basic	
+			NODELIST *p = t->list,*q;
+			q = p;
+			while(p) {
+				q = p;
+				p = p->next;
+			}
+			q->next = (NODELIST *)malloc(sizeof(NODELIST));
+			q = q->next;
+			strcpy(q->cNode,str);
+			q->next = NULL;
+			break;
 		}
 	}
 }
