@@ -132,10 +132,11 @@ int trie_add(TRIE **head,char *str) {
 int trie_check(TRIE **head,char *str) {
 	TRIE *t = *head;
 	int index = 0;
-	while(str){
+	while(*str){
 		NODELIST *l = node_find(t->list,str,&index);
 		if(l && index == strlen(l->cNode)){
 			t = l->tnext;	
+			str += index;
 		}else{
 			t = NULL;
 			break;
