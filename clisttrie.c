@@ -1,5 +1,6 @@
 #include<limits.h>
 #include<string.h>
+#include<time.h>
 	
 #include "clisttrie.h"
 
@@ -150,10 +151,12 @@ int trie_check(TRIE **head,char *str) {
 }
 
 void trie(FILE *pool,FILE *check,FILE *result) {
+	clock_t start,end,start1;
 	TRIE *head = trie_create();
 	char line[BUFFERSIZE];
 	int count=0;
 	int i=0;
+	start = clock();
 	while(fgets(line,BUFFERSIZE,pool)) {
 		/*delete the useless character '\r'*/
 		i = 0;
@@ -161,10 +164,16 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 		line[i] = '\0';
 
 		trie_add(&head,line);
-		if(!(++count%100000))
-		printf("%d\n",count);
+		if(!(++count%100)){
+			end = clock();
+			printf("%d,%f \n",count,(double)(end -start)/CLOCKS_PER_SEC);
+		}
 /*		printf("%s",trie_check(&head,line)?"Yes":"No") ;*/
 	}
+
+	end = clock();
+	printf("Creating tree using %f\n",(double)(end -start)/CLOCKS_PER_SEC);
+	start1 = clock();
 	while(fgets(line,BUFFERSIZE,check)) {
 
 		i = 0;
@@ -177,5 +186,7 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 			fprintf(result,"no\n");
 		}
 	}
+	end = clock();
+	printf("Finding in %f\n",(double)(end -start1)/CLOCKS_PER_SEC);
 	trie_destroy(&head);
 }
