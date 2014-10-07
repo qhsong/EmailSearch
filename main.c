@@ -25,11 +25,11 @@ int main(int argc, char **argv)
 		printf("Input file not found!\n");
 		return 0;
 	}
-/*	bloom(fpStrpool,fpCheckedstr,fpResult);
-	rewind(fpStrpool);
+	bloom(fpStrpool,fpCheckedstr,fpResult);
+/*	rewind(fpStrpool);
 	rewind(fpCheckedstr);
-*/
 	trie(fpStrpool,fpCheckedstr,fpResult2);
+*/
 	fclose(fpStrpool);
 	fclose(fpCheckedstr);
 	fclose(fpResult);

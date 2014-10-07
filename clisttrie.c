@@ -164,7 +164,7 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 		line[i] = '\0';
 
 		trie_add(&head,line);
-		if(!(++count%100)){
+		if(!(++count%100000)){
 			end = clock();
 			printf("%d,%f \n",count,(double)(end -start)/CLOCKS_PER_SEC);
 		}

@@ -88,10 +88,10 @@ int trie_check(TRIE **head,char *str) {
 
 void trie(FILE *pool,FILE *check,FILE *result) {
 	clock_t start,end,start1;
-	start = clock();
 	TRIE *head = trie_create();
 	char line[BUFFERSIZE];
 	int count=0;
+	start = clock();
 	while(fgets(line,BUFFERSIZE,pool)) {
 		trie_add(&head,line);
 		if(!(++count%100000)){

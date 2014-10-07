@@ -44,11 +44,13 @@ int main() {
 	int linecount = 0;
 	char line[1024];
 	int len,i;
+	int max = 0;
 	for(i=0 ;i<512;i++) flag[i] = 0;
 	while(fgets(line,1024,in)) {
 		linecount++;
 		len = strlen(line);
 		count +=len;
+		if(len>max) max = len;
 		/*
 		for(i = 0; i< len - 2 ;i++){
 			if(getpos(line[i])==41){
@@ -64,7 +66,7 @@ int main() {
 		if(flag[i]) printf("%c %d\n",i,i);
 	}
 	*/
-	printf("count is:%ld.Line count is:%d %f",count,linecount,(double)count/(double)linecount);
+	printf("The max is %d\n",max);
 	return 0;
 }
 

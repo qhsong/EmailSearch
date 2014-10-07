@@ -1,5 +1,6 @@
 #include<limits.h>
 #include<string.h>
+#include<time.h>
 
 #include "bloom.h"
 #include "hash.h"
@@ -87,13 +88,24 @@ int bloom_check(BF **bfArray,char *str)
 }
 
 void bloom(FILE *pool,FILE *check,FILE *result) {
+	clock_t start,end,start1;
 	BF *b=bloom_create();
+	int count;
 	char line[BUFFERSIZE];
+	start = clock();
 	/* int pos = 0; */
 	while(fgets(line,BUFFERSIZE,pool)) {
 		bloom_add(&b,line);
+		if(!(++count%100000)){
+			end = clock();
+			printf("%d,%f \n",count,(double)(end -start)/CLOCKS_PER_SEC);
+		}
+
 	/*	printf("%d -> %s",pos++,line); */
 	}
+	end = clock();
+	printf("Creating tree using %f",(double)(end -start)/CLOCKS_PER_SEC);
+	start1 = clock();		
 	while(fgets(line,BUFFERSIZE,check)) {
 		if(bloom_check(&b,line)){
 			fprintf(result,"yes\n");
@@ -101,5 +113,9 @@ void bloom(FILE *pool,FILE *check,FILE *result) {
 			fprintf(result,"no\n");
 		}
 	}
+	end = clock();
+	printf("Finding in %f",(double)(end -start1)/CLOCKS_PER_SEC);
+	
+	
 
 }
