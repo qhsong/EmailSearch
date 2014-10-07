@@ -9,13 +9,13 @@
 
 int find_common_head(char *s1,char *s2) {
 	int index = 0;
-	while(*s1++==*s2++) index++;
+	while(*s1!='\0' && *s2!='\0' && *s1++==*s2++) index++;
 	return index;
 }
 
 NODELIST* node_find(NODELIST *l,char *str,int *count) {
 	while(l){
-		if(*count = find_common_head(l->cNode,str)){
+		if((*count = find_common_head(l->cNode,str))== 0){
 			l = l->next;	
 		}else{
 			return l;
@@ -37,74 +37,57 @@ void trie_destroy(TRIE **head) {
 
 int trie_add(TRIE **head,char *str) {
 	TRIE *t = *head;
-	int index=0,len1,len2;
+	int index=0,len1;
 	char *pstr;
 	while(*str){
 		NODELIST *l =node_find(t->list,str,&index);
-		if(l){	//exist the same header string.OK divided it.
+		if(l){	/*exist the same header string.OK divided it.*/
 			len1 = strlen(l->cNode);
-			len2 = strlen(str);
-			if(!l->tnext){
-				l->tnext = (TRIE *)malloc(sizeof(TRIE));
-				l->tnext->isEmail = false;
-				l->tnext->list = NULL;
-			}
-			if(index == len2 && index !=len1){	//str is short
+			if(index < len1){	/*str is short*/
 			
-				//find the end of list
-				TRIE *tp = l->tnext;
-				NODELIST *p = tp->list,*q;
-				q = p;
-				while(p){
-					q = p;
-					p=p->next;
-				}
+				/*find the end of list*/
+				TRIE *tp = l->tnext,*temp;
+				NODELIST *q;
+				temp =(TRIE *)malloc(sizeof(TRIE));
 				
-				//new a sub node
-				q->next = (NODELIST *)malloc(sizeof(NODELIST));
-				q = q->next;
+				/*new a sub node*/
+				temp->isEmail = false;
+				temp->list = (NODELIST *)malloc(sizeof(NODELIST));
+				q = temp->list;
 				pstr = l->cNode;
 				pstr += index;
 				strcpy(q->cNode,pstr);
 				q->next = NULL;
+				q->tnext = NULL;
 				
-				//change l->cNode
-				l->cNode[index] = '\0';
-
-				//if it is a word,then new a node
-				if(tp->isEmail){
-					q->tnext = (TRIE *)malloc(sizeof(TRIE));
-					q->tnext->isEmail = true;
-					q->tnext->list = NULL;
-				}else{
-					q->tnext = NULL;
+				if(tp) {
+					q->tnext = tp;		
 				}
 				
-				//move t
-				t = tp;
-			}else if((index == len1 && index !=len2) ||(index ==len1 && index==len2)) {  //l->cNode
+				/*redirect the node*/
+				l->tnext = temp;
+
+				/*change l->cNode*/
+				l->cNode[index] = '\0';
+
+				
+				/*move t*/
 				t = l->tnext;
-			}else{	//both has common parti,devided the nodelist
-				NODELIST *p = l,*q;
-				char *ps = str;
-				q = p;
-				while(p){
-					q = p;
-					p = p->next;
+			}else if(index == len1){  /*l->cNode is short*/
+				if(!l->tnext){
+					l->tnext = (TRIE *)malloc(sizeof(TRIE));
+					l->tnext->isEmail = false;
+					l->tnext->list = NULL;
 				}
-				q->next = (NODELIST *)malloc(sizeof(TRIE));
-				q = q->next;
-				ps += index;
-				strcpy(q->cNode,ps);
-				q->tnext = l->tnext;
-				l->cNode[index] = '\0';
-
+				t = l->tnext;
 			}
-			str += index;
-		}else{	//new
-			NODELIST *p = t->list,*q;
-			q = p;
-			while(p) {
+		}else{	/*new*/
+			NODELIST *p,*q;
+			if(!t->list){
+				t->list = (NODELIST *)malloc(sizeof(NODELIST));
+			}
+			q = p = t->list;
+			while(p){
 				q = p;
 				p = p->next;
 			}
@@ -114,11 +97,29 @@ int trie_add(TRIE **head,char *str) {
 			q->next = NULL;
 			break;
 		}
+		str += index;
 	}
+	t->isEmail = true;
+	return 0;
 }
 
 int trie_check(TRIE **head,char *str) {
-
+	TRIE *t = *head;
+	int index = 0;
+	while(str){
+		NODELIST *l = node_find(t->list,str,&index);
+		if(l && index == strlen(l->cNode)){
+			t = l->tnext;	
+		}else{
+			t = NULL;
+			break;
+		}
+	}
+	if(t){
+		return t->isEmail;
+	}else{
+		return false;
+	}
 }
 
 void trie(FILE *pool,FILE *check,FILE *result) {
@@ -127,7 +128,7 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 	int count=0;
 	int i=0;
 	while(fgets(line,BUFFERSIZE,pool)) {
-		//delete the useless character '\r'
+		/*delete the useless character '\r'*/
 		i = 0;
 		while(line[i++]!='\r');
 		line[i] = '\0';

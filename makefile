@@ -1,10 +1,10 @@
 all: strfind
 
-strfind: listtrie.o main.o bloom.o hash.o
-	cc -o strfind -g -Wall -pedantic listtrie.o main.o bloom.o hash.o
+strfind: clisttrie.o main.o bloom.o hash.o
+	cc -o strfind -g -Wall -pedantic clisttrie.o main.o bloom.o hash.o
 
-listtrie.o: listtrie.c listtrie.h
-	cc -o listtrie.o -g -Wall -pedantic -ansi -c listtrie.c
+clisttrie.o: clisttrie.c clisttrie.h
+	cc -o clisttrie.o -g -Wall -pedantic -ansi -c clisttrie.c
 bloom:bloom.c bloom.h
 	cc -o bloom.o -g -Wall -pedantic -ansi -c bloom.c
 main.o: main.c listtrie.h bloom.h
