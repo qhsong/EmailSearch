@@ -11,7 +11,7 @@ typedef struct sNodeList NODELIST;
 typedef struct trieTree TRIE;
 
 struct sNodeList {
-	char cNode[157];
+	char *cNode;
 	TRIE *tnext;
 	struct sNodeList *next;
 };

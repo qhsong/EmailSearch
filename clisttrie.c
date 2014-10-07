@@ -32,6 +32,17 @@ TRIE* trie_create(){
 }
 
 void trie_destroy(TRIE **head) {
+	NODELIST *p,*q;
+	p = (*head)->list;
+	while(p){
+		trie_destroy(&(p->tnext));
+		free(p->cNode);
+		q = p;
+		p = p->next;
+		free(q);
+	}
+	free(*head);
+
 }
 
 
@@ -56,6 +67,7 @@ int trie_add(TRIE **head,char *str) {
 				q = temp->list;
 				pstr = l->cNode;
 				pstr += index;
+				q->cNode = (char *)malloc(4*strlen(pstr));
 				strcpy(q->cNode,pstr);
 				q->next = NULL;
 				q->tnext = NULL;
@@ -85,16 +97,30 @@ int trie_add(TRIE **head,char *str) {
 			NODELIST *p,*q;
 			if(!t->list){
 				t->list = (NODELIST *)malloc(sizeof(NODELIST));
+				t->list->next = NULL;
+				t->list->cNode = NULL;
+				q = t->list;
+			}else{
+				q = p = t->list;
+				while(p){
+					q = p;
+					p = p->next;
+				}
+				q->next = (NODELIST *)malloc(sizeof(NODELIST));
+				q = q->next;
+				q->cNode = NULL;
 			}
-			q = p = t->list;
-			while(p){
-				q = p;
-				p = p->next;
+			if(q->cNode){ 
+				free(q->cNode);
+				q->cNode = NULL;
 			}
-			q->next = (NODELIST *)malloc(sizeof(NODELIST));
-			q = q->next;
+			q->cNode = (char *)malloc(4*strlen(str));
 			strcpy(q->cNode,str);
 			q->next = NULL;
+			q->tnext = (TRIE *)malloc(sizeof(TRIE));
+			q->tnext->isEmail = false;
+			q->tnext->list = NULL;
+			t = q->tnext;
 			break;
 		}
 		str += index;
@@ -130,17 +156,18 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 	while(fgets(line,BUFFERSIZE,pool)) {
 		/*delete the useless character '\r'*/
 		i = 0;
-		while(line[i++]!='\r');
+		while(line[i]!='\r' && line[i]!='\n') i++;
 		line[i] = '\0';
 
 		trie_add(&head,line);
-		if(!(++count%100000))	printf("%d\n",count);
+		if(!(++count%100000))
+		printf("%d\n",count);
 /*		printf("%s",trie_check(&head,line)?"Yes":"No") ;*/
 	}
 	while(fgets(line,BUFFERSIZE,check)) {
 
 		i = 0;
-		while(line[i++]!='\r');
+		while(line[i]!='\r' && line[i]!='\n') i++;
 		line[i] = '\0';
 
 		if(trie_check(&head,line)) {
