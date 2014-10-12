@@ -1,7 +1,8 @@
 #include<limits.h>
 #include<string.h>
 #include<time.h>
-	
+#include<unistd.h>
+
 #include "clisttrie.h"
 
 #define BUFFERSIZE 1024
@@ -188,5 +189,6 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 	}
 	end = clock();
 	printf("Finding in %f\n",(double)(end -start1)/CLOCKS_PER_SEC);
+	pause();
 	trie_destroy(&head);
 }
