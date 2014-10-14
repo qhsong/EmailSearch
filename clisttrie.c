@@ -5,9 +5,11 @@
 
 #include "clisttrie.h"
 
-#define BUFFERSIZE 1024
+#define BUFFERSIZE 320
 
 /*This function used to find the longest common header between s1 and s2.Return the max common character index,if not, return -1; */
+
+int ctrie=0,cnode=0;
 
 int find_common_head(char *s1,char *s2) {
 	int index = 0;
@@ -27,7 +29,7 @@ NODELIST* node_find(NODELIST *l,char *str,int *count) {
 }
 
 TRIE* trie_create(){
-	TRIE *head = (TRIE *)malloc(sizeof(TRIE));
+	TRIE *head = (TRIE *)malloc(sizeof(TRIE));ctrie++;
 	head->isEmail = false;
 	head->list = NULL;
 	return head;
@@ -61,11 +63,11 @@ int trie_add(TRIE **head,char *str) {
 				/*find the end of list*/
 				TRIE *tp = l->tnext,*temp;
 				NODELIST *q;
-				temp =(TRIE *)malloc(sizeof(TRIE));
+				temp =(TRIE *)malloc(sizeof(TRIE));ctrie++;
 				
 				/*new a sub node*/
 				temp->isEmail = false;
-				temp->list = (NODELIST *)malloc(sizeof(NODELIST));
+				temp->list = (NODELIST *)malloc(sizeof(NODELIST));cnode++;
 				q = temp->list;
 				pstr = l->cNode;
 				pstr += index;
@@ -89,7 +91,7 @@ int trie_add(TRIE **head,char *str) {
 				t = l->tnext;
 			}else if(index == len1){  /*l->cNode is short*/
 				if(!l->tnext){
-					l->tnext = (TRIE *)malloc(sizeof(TRIE));
+					l->tnext = (TRIE *)malloc(sizeof(TRIE));ctrie++;
 					l->tnext->isEmail = false;
 					l->tnext->list = NULL;
 				}
@@ -98,7 +100,7 @@ int trie_add(TRIE **head,char *str) {
 		}else{	/*new*/
 			NODELIST *p,*q;
 			if(!t->list){
-				t->list = (NODELIST *)malloc(sizeof(NODELIST));
+				t->list = (NODELIST *)malloc(sizeof(NODELIST));cnode++;
 				t->list->next = NULL;
 				t->list->cNode = NULL;
 				q = t->list;
@@ -108,7 +110,7 @@ int trie_add(TRIE **head,char *str) {
 					q = p;
 					p = p->next;
 				}
-				q->next = (NODELIST *)malloc(sizeof(NODELIST));
+				q->next = (NODELIST *)malloc(sizeof(NODELIST));cnode++;
 				q = q->next;
 				q->cNode = NULL;
 			}
@@ -119,7 +121,7 @@ int trie_add(TRIE **head,char *str) {
 			q->cNode = (char *)malloc(4*strlen(str));
 			strcpy(q->cNode,str);
 			q->next = NULL;
-			q->tnext = (TRIE *)malloc(sizeof(TRIE));
+			q->tnext = (TRIE *)malloc(sizeof(TRIE));ctrei++;
 			q->tnext->isEmail = false;
 			q->tnext->list = NULL;
 			t = q->tnext;
@@ -151,29 +153,46 @@ int trie_check(TRIE **head,char *str) {
 	}
 }
 
+int trimString(char *c){
+	while(*c != '\r' && *c != '\n') {
+		if(*c>='A' && *c<='Z') {
+			*c = *c+32;
+		}else if(*c < 45 || *c> 122){
+			return 1;
+		}
+		c++;
+	}
+	*c = '\0';
+	return 0;
+}
+
 void trie(FILE *pool,FILE *check,FILE *result) {
 	clock_t start,end,start1;
 	TRIE *head = trie_create();
 	char line[BUFFERSIZE];
 	int count=0;
 	int i=0;
+	int len=0,exitflag=0;
 	start = clock();
 	while(fgets(line,BUFFERSIZE,pool)) {
 		/*delete the useless character '\r'*/
-		i = 0;
-		while(line[i]!='\r' && line[i]!='\n') i++;
-		line[i] = '\0';
-
-		trie_add(&head,line);
-		if(!(++count%100000)){
-			end = clock();
-			printf("%d,%f \n",count,(double)(end -start)/CLOCKS_PER_SEC);
+		exitflag = trimString(line);
+		if(!exitflag){
+			trie_add(&head,line);	
+			if(!(++count%100000)){
+				end = clock();
+				printf("%d,%f \n",count,(double)(end -start)/CLOCKS_PER_SEC);
+			}
+		}else{
+			printf("Error email %s",line);
+			continue;
 		}
 /*		printf("%s",trie_check(&head,line)?"Yes":"No") ;*/
 	}
 
 	end = clock();
 	printf("Creating tree using %f\n",(double)(end -start)/CLOCKS_PER_SEC);
+	printf("Totally create trie:%d,listnode:%d",ctrie,cnode);
 	start1 = clock();
 	while(fgets(line,BUFFERSIZE,check)) {
 
