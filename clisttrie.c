@@ -9,7 +9,7 @@
 
 /*This function used to find the longest common header between s1 and s2.Return the max common character index,if not, return -1; */
 
-int ctrie=0,cnode=0;
+int ctrie=0,cnode=0,cchar=0;
 
 int find_common_head(char *s1,char *s2) {
 	int index = 0;
@@ -71,7 +71,7 @@ int trie_add(TRIE **head,char *str) {
 				q = temp->list;
 				pstr = l->cNode;
 				pstr += index;
-				q->cNode = (char *)malloc(4*strlen(pstr));
+				q->cNode = (char *)malloc(4*strlen(pstr));cchar += strlen(pstr);
 				strcpy(q->cNode,pstr);
 				q->next = NULL;
 				q->tnext = NULL;
@@ -115,13 +115,13 @@ int trie_add(TRIE **head,char *str) {
 				q->cNode = NULL;
 			}
 			if(q->cNode){ 
-				free(q->cNode);
+				cchar -=strlen(q->cNode); free(q->cNode);
 				q->cNode = NULL;
 			}
-			q->cNode = (char *)malloc(4*strlen(str));
+			q->cNode = (char *)malloc(4*strlen(str)); cchar += strlen(str);
 			strcpy(q->cNode,str);
 			q->next = NULL;
-			q->tnext = (TRIE *)malloc(sizeof(TRIE));ctrei++;
+			q->tnext = (TRIE *)malloc(sizeof(TRIE));ctrie++;
 			q->tnext->isEmail = false;
 			q->tnext->list = NULL;
 			t = q->tnext;
@@ -184,26 +184,27 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 				printf("%d,%f \n",count,(double)(end -start)/CLOCKS_PER_SEC);
 			}
 		}else{
-			printf("Error email %s",line);
+			/*printf("Error email %s",line);*/
 			continue;
 		}
-/*		printf("%s",trie_check(&head,line)?"Yes":"No") ;*/
 	}
-
 	end = clock();
 	printf("Creating tree using %f\n",(double)(end -start)/CLOCKS_PER_SEC);
-	printf("Totally create trie:%d,listnode:%d",ctrie,cnode);
+	printf("Totally create trie:%d,listnode:%d,cchar:%d\n",ctrie,cnode,cchar);
+	printf("Sizeof(TRIE):%d size(node):%d sizeof(char):%d\n",sizeof(TRIE),sizeof(NODELIST),sizeof(char));
 	start1 = clock();
 	while(fgets(line,BUFFERSIZE,check)) {
 
 		i = 0;
 		while(line[i]!='\r' && line[i]!='\n') i++;
 		line[i] = '\0';
-
-		if(trie_check(&head,line)) {
-			fprintf(result,"yes\n");
-		}else {
-			fprintf(result,"no\n");
+		exitflag = trimString(line);
+		if(!exitflag){
+			if(trie_check(&head,line)) {
+				fprintf(result,"yes\n");
+			}else {
+				fprintf(result,"no\n");
+			}
 		}
 	}
 	end = clock();

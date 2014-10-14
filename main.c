@@ -2,7 +2,7 @@
 #include<string.h>
 #include<stdlib.h>
 
-//#include"bloom.h"
+/*#include"bloom.h"*/
 #include"clisttrie.h"
 
 int main(int argc, char **argv)
