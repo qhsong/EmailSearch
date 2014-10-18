@@ -9,7 +9,7 @@
 
 /*This function used to find the longest common header between s1 and s2.Return the max common character index,if not, return -1; */
 
-int ctrie=0,cnode=0,cchar=0;
+int ctrie=0,cnode=0,cchar=0,ctotal=0;;
 
 int find_common_head(char *s1,char *s2) {
 	int index = 0;
@@ -29,7 +29,7 @@ NODELIST* node_find(NODELIST *l,char *str,int *count) {
 }
 
 TRIE* trie_create(){
-	TRIE *head = (TRIE *)malloc(sizeof(TRIE));ctrie++;
+	TRIE *head = (TRIE *)malloc(sizeof(TRIE));ctrie++;ctotal += sizeof(TRIE);
 	head->isEmail = false;
 	head->list = NULL;
 	return head;
@@ -63,15 +63,15 @@ int trie_add(TRIE **head,char *str) {
 				/*find the end of list*/
 				TRIE *tp = l->tnext,*temp;
 				NODELIST *q;
-				temp =(TRIE *)malloc(sizeof(TRIE));ctrie++;
+				temp =(TRIE *)malloc(sizeof(TRIE));ctrie++;ctotal += sizeof(TRIE);
 				
 				/*new a sub node*/
 				temp->isEmail = false;
-				temp->list = (NODELIST *)malloc(sizeof(NODELIST));cnode++;
+				temp->list = (NODELIST *)malloc(sizeof(NODELIST));cnode++;ctotal += sizeof(NODELIST);
 				q = temp->list;
 				pstr = l->cNode;
 				pstr += index;
-				q->cNode = (char *)malloc(4*strlen(pstr));cchar += strlen(pstr);
+				q->cNode = (char *)malloc(strlen(pstr)+1);cchar += strlen(pstr); ctotal +=(strlen(pstr));
 				strcpy(q->cNode,pstr);
 				q->next = NULL;
 				q->tnext = NULL;
@@ -91,7 +91,7 @@ int trie_add(TRIE **head,char *str) {
 				t = l->tnext;
 			}else if(index == len1){  /*l->cNode is short*/
 				if(!l->tnext){
-					l->tnext = (TRIE *)malloc(sizeof(TRIE));ctrie++;
+					l->tnext = (TRIE *)malloc(sizeof(TRIE));ctrie++;ctotal += sizeof(TRIE);
 					l->tnext->isEmail = false;
 					l->tnext->list = NULL;
 				}
@@ -118,7 +118,7 @@ int trie_add(TRIE **head,char *str) {
 				cchar -=strlen(q->cNode); free(q->cNode);
 				q->cNode = NULL;
 			}
-			q->cNode = (char *)malloc(4*strlen(str)); cchar += strlen(str);
+			q->cNode = (char *)malloc(strlen(str)+1); cchar += strlen(str);
 			strcpy(q->cNode,str);
 			q->next = NULL;
 			q->tnext = (TRIE *)malloc(sizeof(TRIE));ctrie++;
