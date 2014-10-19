@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	FILE *fpStrpool = fopen("strpool.dat","r");
 	FILE *fpCheckedstr = fopen("checkedemail.dat","r");
 	FILE *fpResult2 = fopen("result_trie.dat","w");
-	FILE *fpResult = fopen("result_bloom.dat","w");
+/*	FILE *fpResult = fopen("result_bloom.dat","w");*/
 	if(fpStrpool == NULL || fpCheckedstr == NULL){
 		printf("Input file not found!\n");
 		return 0;
