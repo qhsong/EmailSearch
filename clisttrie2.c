@@ -86,7 +86,7 @@ int trie_add(TRIE **head,char *str) {
 					l->son = (TRIE *)malloc(sizeof(TRIE));
 					l->son->isEmail = false;
 					l->son->son = l->son->bro = NULL;
-					l->bro->str = (char *)malloc(strlen(str)+1);
+					l->son->str = (char *)malloc(strlen(str)+1);
 					strcpy(l->son->str,str);
 					t = l->son;
 					break;
@@ -198,10 +198,10 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 		if(!exitflag){
 			reverseString(line);
 			trie_add(&head,line);	
-			/*if(!(++count%100000)){ */
+			if(!(++count%100000)){ 
 				end = clock();
 				printf("%d,%f \n",count++,(double)(end -start)/CLOCKS_PER_SEC);
-			/*} */
+			} 
 		}else{
 			/*printf("Error email %s",line);*/
 			continue;
@@ -227,5 +227,6 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 	}
 	end = clock();
 	printf("Finding in %f\n",(double)(end -start1)/CLOCKS_PER_SEC);
+	getchar();
 	trie_destroy(&head);
 }
