@@ -1,0 +1,1 @@
+使用方法使用trie:    ./strfind <path_of_strpool> <path_of_checkedstr> --use=trie    输出文件为trie_out.txt使用bloom filter:    ./strfind <path_of_strpool> <path_of_checkedstr> --use=bloom    输出文件为bloom_out.txt查看两个文件是否相同:    diff trie_out.txt bloom_out.txt

@@ -1,0 +1,7 @@
+gcc *.c -o strfind
+rm computer.time
+./strfind /home/bupt/strpool.dat /home/bupt/checkedemail.dat result.dat >>computer.time
+./strfind /home/bupt/strpool.dat /home/bupt/checkedemail.dat result.dat >>computer.time
+./strfind /home/bupt/strpool.dat /home/bupt/checkedemail.dat result.dat >>computer.time
+sum=`awk '{sum+=$1}END{print sum}' computer.time`
+echo `echo $sum/3|bc` >>computer.time

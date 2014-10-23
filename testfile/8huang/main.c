@@ -1,0 +1,136 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+#include "trie.h"
+#include "hash.h"
+#include "bloom.h"
+
+#define MAXLINE 1024
+#define CHARSET 40
+
+char sets[CHARSET] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '_', '-',
+    '@'};
+
+phashfunc hash_funcs[] = {RSHash, JSHash, PJWHash, ELFHash, BKDRHash, SDBMHash, DJBHash, DEKHash, BPHash, FNVHash, APHash, SAXHash};
+
+static char *line_process(char *line);
+static int iscode(char c);
+int
+main(int argc, char *argv[])
+{
+	clock_t start = clock();
+	FILE *fpool, *fchecked, *fres_trie, *fres_bloom;
+	char line[MAXLINE];
+	char *p;
+    struct trie *t;
+    struct bloom *b;
+	
+	if(argc != 4) {
+        fputs("error, usage: \na.out <pool_file> <checked_file> --use=trie\n"
+              "or\na.out <pool_file> <checked_file> --use=bloom\n\n", stderr);
+        exit(1);
+	}
+    
+    if ((fpool = fopen(argv[1], "r")) == NULL) {
+        fprintf(stderr, "cannot open file %s\n", argv[1]);
+        exit(1);
+    }
+    
+    if ((fchecked = fopen(argv[2], "r")) == NULL) {
+        fprintf(stderr, "cannot open file %s\n", argv[2]);
+        exit(1);
+    }
+    
+    if ((fres_trie = fopen("result.dat", "w")) == NULL) {
+        fputs("cannot open trie_out.txt", stderr);
+        exit(1);
+    }
+    
+    if ((fres_bloom = fopen("result.dat", "w")) == NULL) {
+        fputs("cannot open trie_out.txt", stderr);
+        exit(1);
+    }
+    
+    if (strcmp(argv[3], "--use=trie") == 0) {
+        t = trie_init();
+        while (fgets(line, MAXLINE, fpool) != NULL) {
+            p = line_process(line);
+            trie_insert(t, p);
+        }
+        while (fgets(line, MAXLINE, fchecked) != NULL) {
+            p = line_process(line);
+            if (trie_search(t, p)) {
+                fputs("yes\n", fres_trie);
+            } else {
+                fputs("no\n", fres_trie);
+            }
+        }
+    } else if (strcmp(argv[3], "--use=bloom") == 0) {
+        b = bloom_init(239620000, hash_funcs, 12);
+        while (fgets(line, MAXLINE, fpool) != NULL) {
+            p = line_process(line);
+            bloom_insert(b, p);
+        }
+        while (fgets(line, MAXLINE, fchecked) != NULL) {
+            p = line_process(line);
+            if (bloom_search(b, p)) {
+                fputs("yes\n", fres_bloom);
+            } else {
+                fputs("no\n", fres_bloom);
+            }
+        }
+    }
+	printf("%f\n",(double)(clock()-start)/CLOCKS_PER_SEC);
+//	getchar();
+	return 0;
+}
+
+static int
+iscode(char c)
+{
+    int i;
+    
+    for (i = 0; i < CHARSET; ++i)
+        if (sets[i] == c)
+            return 1;
+    return 0;
+}
+
+static char *
+line_process(char *line)
+{
+    int i, len, line_len;
+    char *ptr;
+    
+    line_len = strlen(line);
+    if (line[line_len-1] == '\n') {
+        if (line[line_len-2] == '\r') {
+            len = line_len - 1;
+        } else {
+            len = line_len;
+        }
+    }
+    ptr = malloc(len);
+    if (!ptr) {
+        fputs("malloc error\n", stderr);
+        exit(1);
+    }
+    for (i = 0; i < line_len-2; ++i) {
+        ptr[i] = line[i];
+    }
+    ptr[i] = '\0';
+    for (i = 0; i < strlen(ptr); ++i) {
+        if (isalpha(ptr[i]) && isupper(ptr[i])) {
+            ptr[i] = tolower(ptr[i]);
+        }
+        if (!iscode(ptr[i])) {
+            free(ptr);
+            return NULL;
+        }
+    }
+    return ptr;
+}

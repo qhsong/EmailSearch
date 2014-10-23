@@ -1,0 +1,153 @@
+#include<limits.h>
+#include<string.h>
+#include "trie.h"
+
+
+void trieInsert(Trie *rootNode, const char *str)
+     {
+     	
+        Trie *location = rootNode;
+		char * strTemp = str;
+		/*printf("%s\n",strTemp);*/
+		for(;*(strTemp+2);strTemp++){
+           	   /*printf("%c  %d\n",*strTemp,charToIndex(*strTemp));*/
+		   	   if(!location->next[charToIndex(*strTemp)]){
+			   	  Trie * temp= (Trie *)malloc(sizeof(Trie));
+				  initial(temp);
+				  location->next[charToIndex(*strTemp)] = temp;
+				  
+		   	   	}
+			   location = location->next[charToIndex(*strTemp)];
+		 
+		}
+		location->n++;
+		
+     }
+
+int trieSearch(Trie *rootNode,const char *str)
+    {
+    	/*printf("Search Begin.\n");*/
+		/*printf("%s\n",str);*/
+        Trie *location = rootNode;
+		char * strTemp = str;
+		for(;*(strTemp+2);++strTemp){
+			
+			if(!location->next[charToIndex(*strTemp)]){
+				/*printf("not match\n");*/
+				return 0;
+				}
+			location = location->next[charToIndex(*strTemp)];	
+		}
+		return location->n > 0;
+	}
+
+void trieDel(Trie * rootNode)
+    {
+        int count = 0;
+		for(;count < 40; count ++){
+			if(rootNode->next[count]!=NULL)
+				trieDel(rootNode->next[count]);
+			}
+		free(rootNode);
+    }
+
+void trieCheck(FILE *emailPool,FILE *checkedEmail,FILE *result)
+     {
+        /*printf("begin to check.\n");*/
+		int finResult[101] = {0};
+		int repeatTimes = 1;
+		char *aimEmail[100] = {0};
+		int loadEmail = 0;
+		for(;loadEmail<100;loadEmail++){
+			aimEmail[loadEmail] = (char *)malloc(sizeof(char) * 320);
+			fgets(aimEmail[loadEmail],320,checkedEmail);
+			}
+		for(;repeatTimes<=25;repeatTimes++)
+		{
+     	    Trie *root = (Trie *)malloc(sizeof(Trie));
+		    initial(root);
+		    char line[320] = {0};
+		    int lineNum = 0;
+			long int counter = 1;
+		    long int num = 0;
+		   /* printf("begin to add points.\n");*/
+		
+		    while(fgets(line,320,emailPool) && counter <= 400000){
+			   if(checkstring(line))
+			   {
+			      trieInsert(root,line);
+			      counter ++;
+			   }
+		    }
+		
+		    /*printf("finish building Trie tree.\n");*/
+			loadEmail = 0;
+			for(;loadEmail<100;loadEmail++){
+            
+			   if(checkstring(aimEmail[loadEmail]))
+			   {
+			      if(trieSearch(root,aimEmail[loadEmail]) && finResult[loadEmail+1] == 0)
+				  	finResult[loadEmail+1] = 1;
+			   }
+
+		    }	
+		   printf("Done!");
+		   getchar();
+		    trieDel(root);
+		}
+		int Index = 1;
+		int sum = 0;
+		for(;Index <= 100; Index++){
+			if(finResult[Index] == 1){
+				sum++;
+				fprintf(result,"yes\n",Index,aimEmail[Index-1]);
+			}
+			else
+				fprintf(result,"no\n",Index,aimEmail[Index-1]);
+			}
+		//fprintf(result,"10 million Emails hits %d ,miss %d.\n",sum,100-sum);
+		Index = 0;
+		for(;Index < 100;Index++)
+			free(aimEmail[Index]);
+     }
+
+int charToIndex(char alpha)
+    {
+     if(alpha >='A' && alpha <= 'Z')
+	 	return alpha - 'A';
+	 else if(alpha >= 'a' && alpha <= 'z')
+	 	return alpha - 'a';
+	 else if(alpha >='0' && alpha <= '9')
+	 	return alpha - '0' + 26;
+	 else if(alpha == '@')
+	 	return alpha - '@' + 36;
+	 else if(alpha == '.')
+	 	return alpha - '.' + 37;
+	 else if(alpha == '_')
+	 	return alpha - '_' + 38;
+	 else if(alpha == '-')
+	 	return alpha - '-' + 39;
+	 else
+	 	return -1;
+    }
+
+int checkstring(char *str)
+   {
+    char *strIndex = str;
+   	while(*(strIndex+2))
+	{
+		if(charToIndex(*strIndex) == -1)
+			return 0;
+		strIndex++;
+   	}
+	return 1;
+   }
+
+
+void initial(Trie *root)
+	 {
+	 	memset(root->next,0,sizeof(root->next));
+		root->n = 0;
+	 }
+
+

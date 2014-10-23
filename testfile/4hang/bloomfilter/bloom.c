@@ -1,0 +1,101 @@
+#include<limits.h>
+
+#include "bloom.h"
+#include "hash.h"
+#include<string.h>
+#define SETBIT(a, n) (a[n/CHAR_BIT] |= (1<<(n%CHAR_BIT)))
+#define GETBIT(a, n) (a[n/CHAR_BIT] & (1<<(n%CHAR_BIT)))
+unsigned int(*hashfamily[11])(char*,unsigned int);
+
+BF *bloom_create(int size)
+{
+	int i=0;
+	BF* bloom_filter=(BF*)malloc(sizeof(BF));
+	bloom_filter->size=size;
+	bloom_filter->strpool=malloc(sizeof(char)*size/8);
+	for(i=0;i<size/8;i++)
+	{
+		bloom_filter->strpool[i]=NULL;
+	}
+	return bloom_filter;
+}
+
+int bloom_destroy()
+{
+	return 0;
+}
+
+int bloom_add(char line[],BF* bloom_filter)
+{
+	unsigned int locate=0;
+	int i=0,for_count=0;
+	int length;
+	for_count=0;
+	length=0;
+	while(line[for_count]>32&&line[for_count]<127)
+	{
+		length++;
+		for_count++;
+	}
+	for(i=0;i<11;i++)
+	{	
+		locate=hashfamily[i](line,length);
+		SETBIT(bloom_filter->strpool,locate%239620000);
+	}
+	return 0;
+}
+
+int bloom_check(FILE* fp_strpool,FILE* fp_checkedstr,FILE* fp_result)
+{
+	char line[1024];
+	BF* bloom_filter=bloom_create(239620000);
+	int number=1;
+
+	hashfamily[0]=RSHash;
+	hashfamily[1]=JSHash;
+	hashfamily[2]=PJWHash;
+	hashfamily[3]=ELFHash;
+	hashfamily[4]=BKDRHash;
+	hashfamily[5]=SDBMHash;
+	hashfamily[6]=DJBHash;
+	hashfamily[7]=DEKHash;
+	hashfamily[8]=BPHash;
+	hashfamily[9]=FNVHash;
+	hashfamily[10]=APHash;
+	
+	while(fgets(line,1024,fp_strpool))
+	{
+		bloom_add(line,bloom_filter);
+	}
+
+	while(fgets(line,1024,fp_checkedstr))
+	{
+		int black=0;
+		unsigned int locate=0;
+		int i=0,for_count=0;
+		int length;
+		for_count=0;
+		length=0;
+		while(line[for_count]>32&&line[for_count]<127)
+		{
+			length++;
+			for_count++;
+		}
+		for(i=0;i<11;i++)
+		{	
+			locate=hashfamily[i](line,length);
+			if(GETBIT(bloom_filter->strpool,locate%239620000)==0)
+				break;
+		}	
+		if(i==11)
+		{
+			black=1;
+			fprintf(fp_result,"%s\n","Yes");
+		}
+		else
+		{
+			fprintf(fp_result,"%s\n","No");
+		}
+	}
+	return 0;
+}

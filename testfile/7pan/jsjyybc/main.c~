@@ -1,0 +1,139 @@
+/*
+ * 程序将先后运行Bloom Filter算法和压缩trie树算法，给出运行结果及其运行时间
+ * 运行时间包括所有输入输出时间及运算时间，不包括算法结束时释放动态内存空间的时间
+ * 运行时，控制台给出运行信息，运行时间
+ * 程序结束后，在exe程序所在文件夹生成result_bf.dat,result_trie.dat为所要求的输出
+ * 组员：毛博 盖慧彤
+ */
+#include<stdio.h>
+#include<string.h>
+#include<ctype.h>
+#include<time.h>
+#include"bloom.h"
+//#include"trie.h"
+
+#define SEG_NUM	1024
+#define BIG_PRIME 100000007
+
+int check_string(char *str) {
+	//验证邮箱是否合法
+	int len = strlen(str);
+	int i = 0;
+	for (i = 0; i < len; i++) {
+		if (str[i] <= 95 && str[i] >= 45) {
+			continue;
+		} else {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+void upper_string(char *str) {
+	//小写转大写
+	int i = 0;
+	int length = strlen(str);
+	for (i = 0; i < length; i++) {
+		if (str[i] >= 'a' && str[i] <= 'z') {
+			str[i] -= 32;
+		}
+	}
+}
+
+void fan(char *str) {
+	//翻转字符串（未使用）
+	int len = strlen(str);
+	char temp[len + 1];
+	strcpy(temp, str);
+	int i;
+	for (i = 0; i < len; i++) {
+		temp[i] = str[len - i - 1];
+	}
+	temp[i] = '\0';
+	strcpy(str, temp);
+}
+
+int main(int argc, char *argv[]) {
+	clock_t start=clock();
+	//程序运行时需从cmd启动，后面两个参数依次为源字符串和待查询字符串的文件名（文件地址）
+	char line[1024];
+	if (argc < 2) {
+		fprintf(stderr, "ERROR: No word file specified\n");
+		return -1;
+	}
+
+	//获取时间
+
+	int big_count = 0;
+	int count = 0;
+
+	//bloom filter algorithm
+
+	BF *bloomfilter = bloom_create(BIG_PRIME);
+	freopen(argv[1], "r", stdin);
+	while (scanf("%s", line) != EOF) {
+		upper_string(line);
+		if (check_string(line) == 1) {
+			bloom_add(bloomfilter, line);
+			big_count++;
+		}
+	}
+	fclose(stdin);
+	freopen(argv[2], "r", stdin);
+	freopen("result_bf.dat", "w", stdout);
+	while (scanf("%s", line) != EOF) {
+		upper_string(line);
+		if (check_string(line) == 1 && bloom_check(bloomfilter, line) == 1) {
+			printf("yes\n");
+			count++;
+		} else {
+			printf("no\n");
+		}
+	}
+	fclose(stdin);
+	fclose(stdout);
+	freopen("/dev/stdin", "r", stdin);
+	freopen("/dev/pts/3", "w", stdout);
+
+	printf("%f\n",(double)(clock()-start)/CLOCKS_PER_SEC);
+	pause();
+	bloom_destroy(bloomfilter);
+
+	/*****************************************************************************/
+/*
+	//压缩trie树
+	trie_Node* root;
+	root = trie_create();
+	//读文件，建立压缩trie树
+	freopen(argv[1], "r", stdin);
+	while (scanf("%s", line) != EOF) {
+		upper_string(line);
+		if (check_string(line) == 1) {
+			trie_add(line, root);
+		}
+	}
+	fclose(stdin);
+
+	//查询是否在树中
+	count = 0;
+	freopen(argv[2], "r", stdin);
+	freopen("result_trie.dat", "w", stdout);
+	while (scanf("%s", line) != EOF) {
+		upper_string(line);
+		if (check_string(line) == 1 && trie_check(line, root) == 1) {
+			printf("yes\n");
+			count++;
+		} else {
+			printf("no\n");
+		}
+	}
+	fclose(stdin);
+	fclose(stdout);
+	freopen("/dev/pts/3", "r", stdin);
+	freopen("computer.time", "a", stdout);
+	//printf("存在%d个\n", count);
+*/	
+//	trie_destroy(root);//运行完直接退出，自动释放内存，是否destroy不重要（取消注释可以运行destroy）
+	return 0;
+}
+

@@ -1,0 +1,222 @@
+#include <limits.h>
+//#include <conio.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "trie.h"
+
+void run_trie(trie_Node* root, int deep) {
+	//遍历trie树，调试用
+	if (root == NULL) {
+		return;
+	} else {
+		printf("%d:%s %d\n", deep, root->str, root->is_str);
+		int i = 0;
+		for (i = 0; i < NODE_SIZE; i++) {
+			run_trie(root->child[i], deep + 1);
+		}
+	}
+}
+
+void trie_destroy(trie_Node* root) {
+	//用户接口，销毁trie树
+	int i = 0;
+	for (i = 0; i < NODE_SIZE; i++) {
+		trie_destroy_node(root->child[i]);
+	}
+	free(root->child);
+	free(root->str);
+	free(root);
+}
+
+void trie_destroy_node(trie_Node* root) {
+	//递归删除节点
+	if (root == NULL) {
+		return;
+	} else {
+		free(root->str);
+		if (root->child != NULL) {
+			int i = 0;
+			for (i = 0; i < NODE_SIZE; i++) {
+				trie_destroy_node(root->child[i]);
+			}
+			free(root->child);
+		}
+		free(root);
+		return;
+	}
+}
+
+trie_Node* trie_create() {
+	//用户接口，创建新trie树
+	int i;
+	trie_Node* root = malloc(sizeof(trie_Node));
+	root->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+	root->str = malloc(MAX_LENGTH);
+	root->str[0] = '\0';
+	for (i = 0; i < NODE_SIZE; i++) {
+		root->child[i] = NULL;
+	}
+	root->is_str = 0;
+	return root;
+}
+
+trie_Node* trie_new_Node(char* str) {
+	//新建节点
+	trie_Node* res;
+	res = malloc(sizeof(trie_Node));
+	res->is_str = 0;
+//	res->is_next = 0;
+	res->str = malloc(strlen(str) + 1);
+//	res->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+	res->child = NULL;
+	/*	int i;
+	 for (i = 0; i < NODE_SIZE; i++) {
+	 res->child[i] = NULL;
+	 }
+	 */
+	strcpy(res->str, str);
+	return res;
+}
+
+void trie_add(char *str, trie_Node *root) {
+	//用户接口，添加字符串进树
+	if (strlen(str) != 0) {
+//		printf("%d\n",str[0]-45);
+		trie_add_node(str, root->child[(str[0] - 45)], root);
+	}
+}
+
+void trie_add_node(char *str, trie_Node *root, trie_Node *father) {
+	//添加字符串进树
+	trie_Node* p = root;
+	if (p == NULL) {
+		p = trie_new_Node(str);
+		p->is_str = 1;
+		strcpy(p->str, str);
+		father->child[(str[0] - 45)] = p;
+		return;
+	}
+	int lenA = strlen(str);
+	int lenB = strlen(p->str);
+	int i = 0;
+	for (i = 0; i < lenA && i < lenB; i++) {
+		if (str[i] != p->str[i]) {
+			break;
+		}
+	}
+
+	if (i < lenA && i < lenB) {
+		int j;
+		trie_Node* pa = trie_new_Node(str + i);
+		trie_Node* pb = trie_new_Node(p->str + i);
+		if (p->child != NULL) {
+			pb->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+			for (j = 0; j < NODE_SIZE; j++) {
+				pb->child[j] = p->child[j];
+				p->child[j] = NULL;
+			}
+		} else {
+			p->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+			for (j = 0; j < NODE_SIZE; j++) {
+				p->child[j] = NULL;
+			}
+		}
+		pb->is_str = p->is_str;
+		p->is_str = 0;
+		pa->is_str = 1;
+		p->child[(p->str[i] - 45)] = pb;
+		p->child[(str[i] - 45)] = pa;
+		p->str[i] = '\0';
+		return;
+	}
+
+	if (i == lenA) {
+		if (i == lenB) {
+			p->is_str = 1;
+			return;
+		} else {
+			trie_Node* pb = trie_new_Node(p->str + i);
+			if (p->child != NULL) {
+				pb->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+				int j = 0;
+				for (j = 0; j < NODE_SIZE; j++) {
+					pb->child[j] = p->child[j];
+					p->child[j] = NULL;
+				}
+			} else {
+				p->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+				int j;
+				for (j = 0; j < NODE_SIZE; j++) {
+					p->child[j] = NULL;
+				}
+			}
+			strcpy(pb->str, p->str + i);
+			pb->is_str = p->is_str;
+			p->is_str = 1;
+			p->child[(p->str[i] - 45)] = pb;
+			p->str[i] = '\0';
+			return;
+		}
+	}
+
+	if (i == lenB) {
+		if (p->child != NULL) {
+			if (p->child[(str[i] - 45)] != NULL) {
+				trie_add_node(str + i, p->child[(str[i] - 45)], root);
+				return;
+			} else {
+				trie_Node* pa = trie_new_Node(str + i);
+				p->child[(str[i] - 45)] = pa;
+
+				pa->is_str = 1;
+				return;
+			}
+		}
+	} else {
+		p->child = malloc(NODE_SIZE * sizeof(trie_Node*));
+		trie_Node* pa = trie_new_Node(str + i);
+		int j;
+		for (j = 0; j < NODE_SIZE; j++) {
+			p->child[j] = NULL;
+		}
+		p->child[(str[i] - 45)] = pa;
+		pa->is_str = 1;
+		return;
+	}
+}
+
+int trie_check(char *str, trie_Node* root) {
+	//用户接口，查询字符串是否在树中
+	return trie_check_node(str, root->child[(str[0] - 45)]);
+}
+
+int trie_check_node(char *str, trie_Node* root) {
+	//递归查询节点
+//	printf("%s\n",root->str);
+	if (root == NULL) {
+		return 0;
+	} else {
+//		printf("%c\n",root->str[0]);
+		int i = 0;
+		int lenA = strlen(str);
+		int lenB = strlen(root->str);
+		for (i = 0; i < lenA && i < lenB; i++) {
+			if (str[i] != root->str[i]) {
+				return 0;
+			}
+		}
+		if (i == lenA) {
+			if (i == lenB) {
+				return root->is_str;
+			} else {
+				return 0;
+			}
+		} else {
+			if (root->child == NULL) {
+				return 0;
+			}
+			return trie_check_node(str + i, root->child[(str[i] - 45)]);
+		}
+	}
+}

@@ -1,0 +1,2 @@
+Failed to open strpool.dat.
+Failed to build Trie.
