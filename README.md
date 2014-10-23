@@ -44,4 +44,7 @@ In this way,we use 15.23 gigabytes memory.It also costs too large.So we changedo
 
 Compressed Trie
 ------------
-`
+A traditional Trie tree store a char to indicate the letter in emails.But in compressed trie,we use a string to indicate email.It can save more memory,but also cost more time.This is a compressed trie insertion:
+
+[![insert]](http://dsqiu.iteye.com/blog/1705697)
+[insert]:https://github.com/qhsong/BloomFilter/blob/master/compressedtrie.jpg
