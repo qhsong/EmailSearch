@@ -1,0 +1,13 @@
+#include<limits.h>
+
+#include "trie.h"
+
+int lookup(char *s)
+{
+TrieNode 
+}
+
+int trie_check()
+{
+	return 0;
+}
