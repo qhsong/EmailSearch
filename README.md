@@ -48,3 +48,42 @@ A traditional Trie tree store a char to indicate the letter in emails.But in com
 
 [![insert]](http://dsqiu.iteye.com/blog/1705697)
 [insert]:https://github.com/qhsong/BloomFilter/blob/master/compressedtrie.jpg
+For compressed trie node,it save a string which those emails have common head file.<br>
+We use this struct to save it in clisttrie.c and clisttrie.h .
+```c
+	typedef struct sNodeList NODELIST;
+	typedef struct trieTree TRIE;
+
+	struct sNodeList {
+	    char *cNode;
+	    TRIE *tnext;
+	    struct sNodeList *next;
+	};
+
+
+
+	struct trieTree{
+	   int isEmail;
+	   struct sNodeList *list;
+	};
+```
+It use approximately 1.2 gigabytes memory.But is it the limit?Absolutely not.We change this tree to binary tree.It can save more memory.The struct like this:
+```c
+typedef struct trieTree TRIE;
+
+
+struct trieTree{
+	short int isEmail;
+	char *str;
+	TRIE *bro;
+	TRIE *son;
+};
+```
+
+It use 1 gigabytes to finish find the program.</br>
+
+Finally
+========
+This is a first homework in bupt. Use github to save my code .I like it.<br>
+
+[Visit my blog](http://sqh.me/blog)
