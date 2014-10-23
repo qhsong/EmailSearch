@@ -1,11 +1,11 @@
-all: strfind
+all: strsearch
 
-strfind: clisttrie2.o main.o
-	cc -o strfind -g -Wall -pedantic clisttrie2.o main.o
+strsearch: trie.o main.o
+	cc -o strsearch -g -Wall -pedantic trie.o main.o
 
-clisttrie2.o: clisttrie2.c clisttrie2.h
-	cc -o clisttrie2.o -g -Wall -pedantic -ansi -c clisttrie2.c
-main.o: main.c clisttrie2.h 
+trie.o: trie.c trie.h
+	cc -o trie.o -g -Wall -pedantic -ansi -c trie.c
+main.o: main.c trie.h 
 	cc -o main.o -g -Wall -pedantic -ansi -c main.c
 clean:
 	rm *.o && rm strfind
