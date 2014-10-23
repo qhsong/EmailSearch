@@ -2,8 +2,7 @@
 #include<string.h>
 #include<time.h>
 #include<unistd.h>
-
-#include "clisttrie2.h"
+#include "trie.h"
 
 #define BUFFERSIZE 320
 
@@ -185,31 +184,21 @@ void reverseString(char *str) {
 }
 
 void trie(FILE *pool,FILE *check,FILE *result) {
-	clock_t start,end,start1;
 	TRIE *head = trie_create();
 	char line[BUFFERSIZE];
-	int count=0;
-	int i=0;
 	int exitflag=0;
-	start = clock();
+	int i;
 	while(fgets(line,BUFFERSIZE,pool)) {
 		/*delete the useless character '\r'*/
 		exitflag = trimString(line);
 		if(!exitflag){
 			reverseString(line);
-			trie_add(&head,line);	
-			if(!(++count%100000)){ 
-				end = clock();
-				printf("%d,%f \n",count++,(double)(end -start)/CLOCKS_PER_SEC);
-			} 
+			trie_add(&head,line);	 
 		}else{
 			/*printf("Error email %s",line);*/
 			continue;
 		}
 	}
-	end = clock();
-	printf("Creating tree using %f\n",(double)(end -start)/CLOCKS_PER_SEC);
-	start1 = clock();
 	while(fgets(line,BUFFERSIZE,check)) {
 
 		i = 0;
@@ -225,8 +214,5 @@ void trie(FILE *pool,FILE *check,FILE *result) {
 			}
 		}
 	}
-	end = clock();
-	printf("Finding in %f\n",(double)(end -start1)/CLOCKS_PER_SEC);
-	getchar();
 	trie_destroy(&head);
 }
