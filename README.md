@@ -86,4 +86,4 @@ Finally
 ========
 This is a first homework in bupt. Use github to save my code .I like it.<br>
 
-[Visit my blog](http://sqh.me/blog)
+[Visit my blog](http://sqh.me/)
